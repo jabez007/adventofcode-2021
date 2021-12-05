@@ -15,19 +15,20 @@ fun generateLine(x1: Number, y1: Number, x2: Number, y2: Number): Array<String> 
     points map "$(x1 + (xFactor * $$)),$(y1 + (yFactor * $$))"
 }
 
-var points = flatten((payload splitBy "\n") map (
+var points = (payload splitBy "\n") map (
     (($ match /(\d+),(\d+) -> (\d+),(\d+)/) dw::core::Arrays::drop 1)
-) map (item) -> do {
+) reduce (item, acc = []) -> do {
     var x1 = item[0] as Number
     var y1 = item[1] as Number
     var x2 = item[2] as Number
     var y2 = item[3] as Number
     ---
-    if (x1 == x2 or y1 == y2) // Consider only horizontal and vertical lines
-        generateLine(x1, y1, x2, y2)
-    else
-        []
-})
+    acc ++ 
+        if (x1 == x2 or y1 == y2) // Consider only horizontal and vertical lines
+            generateLine(x1, y1, x2, y2)
+        else
+            []
+}
 
 output application/json
 ---
