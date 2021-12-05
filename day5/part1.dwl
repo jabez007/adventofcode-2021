@@ -1,8 +1,15 @@
 %dw 2.0
+
+fun gcd(a: Number, b: Number): Number = 
+    if (b == 0)
+        a
+    else
+        gcd(b, a mod b)
+
 fun generateLine(x1: Number, y1: Number, x2: Number, y2: Number): Array<String> = do {
     var xFactor = if (x1 == x2) 0 else ((x2 - x1) / abs(x2 - x1))
     var yFactor = if (y1 == y2) 0 else ((y2 - y1) / abs(y2 - y1))
-    var length = sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2)) + 1
+    var length = gcd(abs(x2 - x1), abs(y2 - y1)) + 1
     var points = ("." dw::core::Strings::repeat length) splitBy ""
     ---
     points map "$(x1 + (xFactor * $$)),$(y1 + (yFactor * $$))"
