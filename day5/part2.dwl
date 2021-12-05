@@ -136,17 +136,19 @@ var intersections = dw::util::Timer::duration(() ->
         ---
         acc update {
             case .drop! -> newDrop
-            case .intersections! -> ($ default []) ++ (
+            case .intersections! -> ((($ default []) ++ (
                 remainingVectors reduce (rv, xing = []) -> (xing ++ 
                     doIntersect(v[0], v[1], rv[0], rv[1])
                 )
-            ) distinctBy (p) -> ("$(p.x),$(p.y)")
+            )) distinctBy (p) -> ("$(p.x),$(p.y)")) default []
         }
     }
 )
-var time = log("intersections", "$(intersections.time)ms")
+//var time = log("intersections", "$(intersections.time)ms")
 
 output application/json
 ---
-//intersections.time
-sizeOf(intersections.result.intersections default [])
+{
+    time: intersections.time,
+    result: sizeOf(intersections.result.intersections default [])
+}
