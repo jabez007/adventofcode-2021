@@ -129,20 +129,24 @@ var vectors: Array<Array<Point>> = (payload splitBy "\n") map (
     ]
 }
 
-var intersections = vectors reduce (v, acc = {}) -> do {
-    var newDrop = (acc.drop default 0) + 1
-    var remainingVectors = vectors dw::core::Arrays::drop newDrop
-    ---
-    acc update {
-        case .drop! -> newDrop
-        case .intersections! -> ($ default []) ++ (
-            remainingVectors reduce (rv, xing = []) -> (xing ++ 
-                doIntersect(v[0], v[1], rv[0], rv[1])
-            )
-        ) distinctBy (p) -> ("$(p.x),$(p.y)")
+var intersections = dw::util::Timer::duration(() -> 
+    vectors reduce (v, acc = {}) -> do {
+        var newDrop = (acc.drop default 0) + 1
+        var remainingVectors = vectors dw::core::Arrays::drop newDrop
+        ---
+        acc update {
+            case .drop! -> newDrop
+            case .intersections! -> ($ default []) ++ (
+                remainingVectors reduce (rv, xing = []) -> (xing ++ 
+                    doIntersect(v[0], v[1], rv[0], rv[1])
+                )
+            ) distinctBy (p) -> ("$(p.x),$(p.y)")
+        }
     }
-}
+)
+var time = log("intersections", "$(intersections.time)ms")
 
 output application/json
 ---
-sizeOf(intersections.intersections default [])
+//intersections.time
+sizeOf(intersections.result.intersections default [])
