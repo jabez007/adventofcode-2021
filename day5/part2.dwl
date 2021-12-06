@@ -133,14 +133,17 @@ var intersections = dw::util::Timer::duration(() ->
     vectors reduce (v, acc = {}) -> do {
         var newDrop = (acc.drop default 0) + 1
         var remainingVectors = vectors dw::core::Arrays::drop newDrop
+        var newIntersections = remainingVectors reduce (rv, xing = {}) -> (
+            xing ++ (doIntersect(v[0], v[1], rv[0], rv[1]) reduce (p, xing_ = {}) -> 
+                xing_ dw::core::Objects::mergeWith {
+                    "$(p.x),$(p.y)": 1
+                }
+            )
+        )
         ---
         acc update {
             case .drop! -> newDrop
-            case .intersections! -> ((($ default []) ++ (
-                remainingVectors reduce (rv, xing = []) -> (xing ++ 
-                    doIntersect(v[0], v[1], rv[0], rv[1])
-                )
-            )) distinctBy (p) -> ("$(p.x),$(p.y)")) default []
+            case .intersections! -> ($ default {}) dw::core::Objects::mergeWith newIntersections
         }
     }
 )
@@ -150,5 +153,5 @@ output application/json
 ---
 {
     time: intersections.time,
-    result: sizeOf(intersections.result.intersections default [])
+    result: sizeOf(intersections.result.intersections default {})
 }
