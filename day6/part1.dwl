@@ -18,16 +18,16 @@ fun lanternfishModel(state: Population, days: Number): Population =
     else do {
         var newState = log(
             "$(days)", 
-            state update {
-                case ."0"! -> state."1" default 0
-                case ."1"! -> state."2" default 0
-                case ."2"! -> state."3" default 0
-                case ."3"! -> state."4" default 0
-                case ."4"! -> state."5" default 0
-                case ."5"! -> state."6" default 0
-                case ."6"! -> (state."0" default 0) + (state."7" default 0)
-                case ."7"! -> state."8" default 0
-                case ."8"! -> state."0" default 0
+            {
+                "0": state."1" default 0,
+                "1": state."2" default 0,
+                "2": state."3" default 0,
+                "3": state."4" default 0,
+                "4": state."5" default 0,
+                "5": state."6" default 0,
+                "6": (state."0" default 0) + (state."7" default 0),
+                "7": state."8" default 0,
+                "8": state."0" default 0,
             }
         )
         ---
