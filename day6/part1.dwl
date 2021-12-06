@@ -34,7 +34,7 @@ fun lanternfishModel(state: Population, days: Number): Population =
         lanternfishModel(newState, days - 1)
     }
 
-fun lanternfishModel(state: Array<Number>, days: Number): Population = do {
+fun lanternfishModel(state: Array<String>, days: Number): Population = do {
     var populationState = (state groupBy $) mapObject {
         ($$): sizeOf($)
     }
@@ -42,7 +42,7 @@ fun lanternfishModel(state: Array<Number>, days: Number): Population = do {
     lanternfishModel(populationState, days)
 }
 
-var init = (payload splitBy ",") map ($ as Number)
+var init = payload splitBy ","
 
 var population = dw::util::Timer::duration(() -> lanternfishModel(init, 80))
 
