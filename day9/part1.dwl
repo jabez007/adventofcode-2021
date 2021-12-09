@@ -5,8 +5,8 @@ output application/json
 dw::util::Timer::duration(() -> do {
     var heightmap = (payload splitBy "\n")
     var adjacent = heightmap map (row, rIndex) ->
-        (row splitBy "") map (column, cIndex) -> [
-            column, 
+        (row splitBy "") map (item, cIndex) -> [
+            item,
             [
                 if (cIndex == 0) null else row[cIndex - 1],
                 row[cIndex + 1],
