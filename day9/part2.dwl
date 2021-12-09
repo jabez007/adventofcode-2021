@@ -23,7 +23,6 @@ fun basin(heightmap: Array<String>, rIndex: Number, cIndex: Number): Array<Array
     ) distinctBy "$($[0]),$($[1])"
 }
 
-
 output application/json
 ---
 dw::util::Timer::duration(() -> do {
