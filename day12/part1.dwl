@@ -1,6 +1,6 @@
 %dw 2.0
 
-fun findOut(allPaths: Array<Array<String>>, visited: Array<String> = []): Array<Array<String>> = 
+fun findOut(allPaths: Array<Array<String>>, visited: Array<String>): Array<Array<String>> = 
     if (visited[-1] == "end")
         log("visited", [visited])
     else do {
