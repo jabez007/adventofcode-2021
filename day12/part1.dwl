@@ -2,7 +2,7 @@
 
 fun findOut(allPaths: Array<Array<String>>, visited: Array<String>): Array<Array<String>> = 
     if (visited[-1] == "end")
-        log("visited", [visited])
+        [visited]
     else do {
         var current = visited[-1]
         var next = (allPaths filter ($ contains current)) map ($ -- [current])[0]
