@@ -8,7 +8,7 @@ fun plot(dots: Array<Array<Number>>): String = do {
         (0 to yMax) map (y) -> (
             (0 to xMax) map (x) -> 
                 if (dots contains [x, y])
-                    "*"
+                    "#"
                 else
                     " "
         ) joinBy ""
