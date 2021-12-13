@@ -26,13 +26,15 @@ dw::util::Timer::duration(() -> do {
         else -> [0, 0]
     }
     ---
-    plot(folds reduce (f, acc = dots) -> (
-        acc map (d) ->
-            d map (
-                if ((f[$$] > 0) and $ > f[$$])
-                    f[$$] - ($ - f[$$])
-                else
-                    $
-            )
-    ) distinctBy "$($[0]),$($[1])")
+    plot(
+        folds reduce (f, acc = dots) -> (
+            acc map (d) ->
+                d map (
+                    if ((f[$$] > 0) and $ > f[$$])
+                        f[$$] - ($ - f[$$])
+                    else
+                        $
+                )
+        ) distinctBy "$($[0]),$($[1])"
+    )
 }).result
