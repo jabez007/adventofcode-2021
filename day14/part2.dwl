@@ -10,13 +10,13 @@ fun step(inputPairs: Object<String, Number>, insertRules: Object<String, String>
     (inputPairs pluck $$) reduce (p, acc = {}) -> do {
         var insert = insertRules[p] default ""
         ---
-        if (not isEmpty(insert))
+        if (isEmpty(insert))
+            acc
+        else
             acc update {
                 case ."$(p[0])$(insert)"! -> ($ default 0) + inputPairs[p]
                 case ."$(insert)$(p[1])"! -> ($ default 0) + inputPairs[p]
             }
-        else
-            acc
     }
 
 output application/json
