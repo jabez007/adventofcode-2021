@@ -35,7 +35,7 @@ dw::util::Timer::duration(() -> do {
         }
     }
     var result = cycle(template, rules, 10)
-    var occurances = (result splitBy "") groupBy $ mapObject { ($$): sizeOf($) }
+    var occurences = (result splitBy "") groupBy $ mapObject { ($$): sizeOf($) }
     ---
-    max(occurances pluck $) - min(occurances pluck $)
+    max(occurences pluck $) - min(occurences pluck $)
 })
