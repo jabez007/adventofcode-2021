@@ -1,7 +1,7 @@
 %dw 2.0
 
 fun findPaths(
-    riskMap: Array<String>,
+    riskMap: Array<String>|Array<Array<String>>,
     priorityQueue: Object<String, Number> = { "0,0": 0 },
     visited: Object<String, Boolean> = {},
     riskPaths: Object<String, Array<Number>> = {}
@@ -56,9 +56,10 @@ fun findPaths(
 output application/json
 ---
 dw::util::Timer::duration(() -> do {
-    var riskLevels = (
+    var riskLevels = (payload splitBy "\n") map ($ splitBy "") 
+    var enhancedRiskLevels = (
         ((0 to 4) as Array<Number>) flatMap (n) ->
-            (payload splitBy "\n") map ($ splitBy "") map (r) ->
+            riskLevels map (r) ->
                 ((0 to 4) as Array<Number>) reduce (m, acc = "") ->
                     acc ++ ((r map (c) -> do {
                         var newValue = (c as Number) + (n + m)
