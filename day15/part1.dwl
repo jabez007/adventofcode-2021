@@ -58,5 +58,7 @@ output application/json
 dw::util::Timer::duration(() -> do {
     var riskLevels = payload splitBy "\n"
     ---
-    findPaths(riskLevels)["$(sizeOf(riskLevels) - 1),$(sizeOf(riskLevels[sizeOf(riskLevels) - 1]) - 1)"]
+    sum(
+        findPaths(riskLevels)["$(sizeOf(riskLevels) - 1),$(sizeOf(riskLevels[sizeOf(riskLevels) - 1]) - 1)"]
+    )
 })
