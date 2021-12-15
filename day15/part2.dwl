@@ -56,17 +56,19 @@ fun findPaths(
 output application/json
 ---
 dw::util::Timer::duration(() -> do {
-    var riskLevels = ((0 to 4) as Array<Number>) flatMap (n) ->
-        (payload splitBy "\n") map ($ splitBy "") map (r) ->
-            ((0 to 4) as Array<Number>) reduce (m, acc = "") ->
-                acc ++ ((r map (c) -> do {
-                    var newValue = (c as Number) + (n + m)
-                    ---
-                    if (newValue >= 10)
-                        (newValue + 1) mod 10
-                    else
-                        newValue 
-                }) joinBy "")
+    var riskLevels = (
+        ((0 to 4) as Array<Number>) flatMap (n) ->
+            (payload splitBy "\n") map ($ splitBy "") map (r) ->
+                ((0 to 4) as Array<Number>) reduce (m, acc = "") ->
+                    acc ++ ((r map (c) -> do {
+                        var newValue = (c as Number) + (n + m)
+                        ---
+                        if (newValue >= 10)
+                            (newValue + 1) mod 10
+                        else
+                            newValue 
+                    }) joinBy "")
+    ) map ($ as String)
     ---
     sum(
         findPaths(riskLevels)["$(sizeOf(riskLevels) - 1),$(sizeOf(riskLevels[sizeOf(riskLevels) - 1]) - 1)"]
