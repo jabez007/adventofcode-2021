@@ -88,14 +88,16 @@ fun decodePacket(binary: String): LiteralPacket | OperatorPacket = do {
             ---
             if (lengthTypeId == "0") do {
                 var subPacketsLength = fromBinary(binary[7 to 21])
+                var subPackets = decodeSubPacketsByLength(
+                    binary[22 to (sizeOf(binary) - 1)],
+                    subPacketsLength
+                )
                 ---
                 {
                     subPacketsLength: subPacketsLength,
-                    subPackets: decodeSubPacketsByLength(
-                        binary[22 to (sizeOf(binary) - 1)],
-                        subPacketsLength
-                    ),
-                    size: 22 + subPacketsLength
+                    subPackets: subPackets,
+                    size: 22 + subPacketsLength,
+                    leftOvers: subPackets[-1].leftOvers
                 }
             } else do {
                 var subPacketsCount =  fromBinary(binary[7 to 17])
@@ -107,12 +109,16 @@ fun decodePacket(binary: String): LiteralPacket | OperatorPacket = do {
                 {
                     subPacketsCount: subPacketsCount,
                     subPackets: subPackets,
-                    size: 18 + sum(subPackets map ($.size as Number))
+                    size: 18 + sum(subPackets map ($.size as Number)),
+                    leftOvers: subPackets[-1].leftOvers
                 }
             }
         }
     )
 }
+
+fun versionSum(packet: LiteralPacket | OperatorPacket): Number =
+    packet.version + sum((packet.subPackets default []) map versionSum($))
 
 output application/json
 ---
@@ -126,5 +132,5 @@ dw::util::Timer::duration(() -> do {
         )
     )
     ---
-    decodePacket(transmissions[0])
+    transmissions map versionSum(decodePacket($))
 })
