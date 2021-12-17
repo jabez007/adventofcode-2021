@@ -14,14 +14,15 @@ type OperatorPacket = Packet & {
     subPackets: Array<LiteralPacket | OperatorPacket>
 }
 
-fun reduceBitGroups(fives: Array<String>, included: String = "" ): String = do {
-    var newIncluded = included ++ (fives[0][1 to 4] default "")
+fun reduceBitGroups(binary: String, included: String = "" ): String = do {
+    var groupPrefix = binary[0]
+    var newIncluded = included ++ (binary[1 to 4] default "")
     ---
-    if (fives[0][0] == "0")
+    if (groupPrefix == "0")
         newIncluded
     else
         reduceBitGroups(
-            fives dw::core::Arrays::drop 1, 
+            binary[5 to -1], 
             newIncluded
         )
 }
@@ -68,18 +69,14 @@ fun decodePacket(binary: String): LiteralPacket | OperatorPacket = do {
     ---
     packet ++ (
         if (packet.typeId == 4) do {
-            var bits = binary[6 to (sizeOf(binary) - 1)]
-            var bitGroups = bits dw::core::Strings::substringEvery 5
-            var literalValue = reduceBitGroups(bitGroups)
-            var leftOvers = binary[
-                (6 + sizeOf(literalValue) + (sizeOf(literalValue) / 4)) 
-                to 
-                (sizeOf(binary) - 1)
-            ]
+            var bits = binary[6 to -1]
+            var literalValue = reduceBitGroups(bits)
+            var packetSize = (6 + sizeOf(literalValue) + (sizeOf(literalValue) / 4))
+            var leftOvers = binary[packetSize to -1]
             ---
             {
                 value: fromBinary(literalValue),
-                size: (6 + sizeOf(literalValue) + (sizeOf(literalValue) / 4)),
+                size: packetSize,
                 leftOvers: leftOvers
             }
         }
@@ -89,7 +86,7 @@ fun decodePacket(binary: String): LiteralPacket | OperatorPacket = do {
             if (lengthTypeId == "0") do {
                 var subPacketsLength = fromBinary(binary[7 to 21])
                 var subPackets = decodeSubPacketsByLength(
-                    binary[22 to (sizeOf(binary) - 1)],
+                    binary[22 to -1],
                     subPacketsLength
                 )
                 ---
@@ -102,7 +99,7 @@ fun decodePacket(binary: String): LiteralPacket | OperatorPacket = do {
             } else do {
                 var subPacketsCount =  fromBinary(binary[7 to 17])
                 var subPackets = decodeSubPacketsByCount(
-                    binary[18 to (sizeOf(binary) - 1)],
+                    binary[18 to -1],
                     subPacketsCount
                 )
                 ---
@@ -123,8 +120,7 @@ fun versionSum(packet: LiteralPacket | OperatorPacket): Number =
 output application/json
 ---
 dw::util::Timer::duration(() -> do {
-    var transmissions = (payload splitBy "\n") map log(
-        "binary", 
+    var transmissions = (payload splitBy "\n") map (
         dw::core::Strings::leftPad(
             toBinary(fromHex($)), 
             ceil(sizeOf(toBinary(fromHex($))) / 4) * 4, 
