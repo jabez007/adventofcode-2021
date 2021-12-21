@@ -27,6 +27,27 @@ fun combinations(items: Array<String>, size: Number): Array<Array<String>> =
         combinations(items[1 to -1] default [], size)
     )
 
+fun findOverlap(scanner1: Array<String>, scanner2options: Array<Array<String>>): Array<Array<String>> = 
+    if (isEmpty(scanner2options))
+        []
+    else do {
+        var scanner1diffs = scanner1 map (b, i) ->
+            (scanner1 filter $$ != i) map vectorDiff($, b) orderBy $
+        var scanner2diffs = scanner2options[0] map (b, i) ->
+            (scanner2options[0] filter $$ != i) map vectorDiff($, b) orderBy $
+        var matchOff = scanner1diffs map (d) -> (
+            scanner2diffs dw::core::Arrays::indexWhere (d == $)
+        )
+        ---
+        if (matchOff dw::core::Arrays::every ($ > -1))
+            matchOff map [
+                scanner1[$$],
+                scanner2options[0][$]
+            ]
+        else
+            findOverlap(scanner1, scanner2options dw::core::Arrays::drop 1)
+    }
+
 output application/json
 ---
 dw::util::Timer::duration(() -> do {
@@ -36,31 +57,9 @@ dw::util::Timer::duration(() -> do {
 
     var options = scanners map combinations($, 3)
 
-    var signatures = options map (o) ->
-        o map (s) ->
-            s map (b, i) ->
-                (s filter $$ != i) map vectorDiff($, b) orderBy $
-    
-    var findOverlappingSignatures = (
-        signatures[0] map (d0) -> (
-            signatures[1] dw::core::Arrays::indexWhere (d1) ->
-                d1 dw::core::Arrays::every (d0 contains $)
-        )
-    )
+    var overlap = options[0] flatMap findOverlap($, options[1])
 
-    var overlappedSignatures = [
-        signatures[0][findOverlappingSignatures dw::core::Arrays::indexWhere ($ > -1)],
-        signatures[1][findOverlappingSignatures dw::core::Arrays::firstWith ($ > -1) default -1]
-    ]
-
-    var overlap = options[0][findOverlappingSignatures dw::core::Arrays::indexWhere ($ > -1)] map (p, i) -> [
-        p,
-        options[1][findOverlappingSignatures dw::core::Arrays::firstWith ($ > -1) default -1][
-            signatures[1][findOverlappingSignatures dw::core::Arrays::firstWith ($ > -1) default -1] dw::core::Arrays::indexWhere (
-                $ == overlappedSignatures[0][i]
-            )
-        ]
-    ]
+    var scanner1position = overlap map vectorDiff($[0], $[1])
     ---
-    overlap
+    scanner1position
 })
