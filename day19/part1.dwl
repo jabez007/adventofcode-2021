@@ -32,7 +32,35 @@ output application/json
 dw::util::Timer::duration(() -> do {
     var scanners = (
         (payload splitBy /--- scanner (\d+) ---/) filter (not isEmpty($))
-     ) map (trim($) splitBy "\n")
+    ) map (trim($) splitBy "\n")
+
+    var options = scanners map combinations($, 3)
+
+    var signatures = options map (o) ->
+        o map (s) ->
+            s map (b, i) ->
+                (s filter $$ != i) map vectorDiff($, b) orderBy $
+    
+    var findOverlappingSignatures = (
+        signatures[0] map (d0) -> (
+            signatures[1] dw::core::Arrays::indexWhere (d1) ->
+                d1 dw::core::Arrays::every (d0 contains $)
+        )
+    )
+
+    var overlappedSignatures = [
+        signatures[0][findOverlappingSignatures dw::core::Arrays::indexWhere ($ > -1)],
+        signatures[1][findOverlappingSignatures dw::core::Arrays::firstWith ($ > -1) default -1]
+    ]
+
+    var overlap = options[0][findOverlappingSignatures dw::core::Arrays::indexWhere ($ > -1)] map (p, i) -> [
+        p,
+        options[1][findOverlappingSignatures dw::core::Arrays::firstWith ($ > -1) default -1][
+            signatures[1][findOverlappingSignatures dw::core::Arrays::firstWith ($ > -1) default -1] dw::core::Arrays::indexWhere (
+                $ == overlappedSignatures[0][i]
+            )
+        ]
+    ]
     ---
-    scanners
+    overlap
 })
